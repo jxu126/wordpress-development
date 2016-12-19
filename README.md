@@ -8,7 +8,7 @@ Starting point for local Wordpress development.
 
     docker-compose up
 
-Go through the installation at http://localhost:8000/
+Go through the installation at [http://localhost:8000/](http://localhost:8000/)
 
 ### Stop the Docker bundle
 
