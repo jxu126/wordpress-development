@@ -40,8 +40,55 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 
 ### Import existing database
 
-    docker exec -i wordpressdevelopment_db_1 mysql -uwordpress -pwordpress wordpress < dump.sql
+#### Replace URLs in the database dump
 
-## Dump database
+    cat dump.sql | python utils/modify_database_dump.py --old-url <OLD URL> > modified-dump.sql
+
+#### Import from modified dump
+
+    docker exec -i wordpressdevelopment_db_1 mysql -uwordpress -pwordpress wordpress < modified-dump.sql
+
+### Dump database
 
     docker exec -i wordpressdevelopment_db_1 sh -c 'exec mysqldump --all-databases -uwordpress -pwordpress'
+
+## Deploying to live site
+
+### Deploy new version
+
+If your work is already committed:
+
+    git ftp push
+
+To ignore warning about uncommitted work:
+
+    git ftp push --force
+
+### Set up git-ftp
+
+We are using [`git-ftp`](https://github.com/git-ftp/git-ftp/blob/master/man/git-ftp.1.md) to manage deployments to the live FTP server.
+
+Install `git-ftp` (requires [`homebrew`](http://brew.sh/)):
+
+    brew install git
+    brew install curl --with-ssl --with-libssh2
+    brew install git-ftp
+
+Configure it using:
+
+    git config git-ftp.user <FTP USER>
+    git config git-ftp.url ftpes://<FTP SERVER>/www/wp-content/themes/<THEME NAME>
+    git config git-ftp.syncroot wordpress/wp-content/themes/<THEME NAME>
+    git config git-ftp.password *******
+
+which should result in the following inside `.git/config`:
+
+    [git-ftp]
+	    user = <FTP USER>
+	    url = ftpes://<FTP SERVER>/www/wp-content/themes/<THEME NAME>
+        syncroot = wordpress/wp-content/themes/<THEME NAME>
+	    password = *******
+
+Finally, to activate `git-ftp`, run:
+
+    git ftp init

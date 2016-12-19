@@ -32,3 +32,6 @@ wordpress/wp-settings.php
 wordpress/wp-signup.php
 wordpress/wp-trackback.php
 wordpress/xmlrpc.php
+
+# Database dumps
+*.sql
